@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2015-2025 한국콜마 핵심 사업 트렌드 분석</title>
+    <!-- 기본 폰트 (모든 결과물에 포함) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <!-- 아이콘 라이브러리 (2번 선택 시에만 포함) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* CSS 변수 (Vibrant Creative 테마) */
+        :root {
+            --primary-color: #8A2BE2; /* 보라 */
+            --secondary-color: #FF1493; /* 핑크 */
+            --background-color: #f8f7f4;
+            --text-color: #1f2937;
+            --card-bg-color: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* 가로 스크롤 방지 */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* HeroSection 컴포넌트 */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .hero-section h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: -1px;
+        }
+        .hero-section p {
+            font-size: 1.4em;
+            opacity: 0.9;
+        }
+
+        /* Infographic Section (슬라이드) 스타일링 */
+        .infographic-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px; /* 슬라이드 높이 확보 */
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            flex-wrap: wrap; /* 작은 화면에서 줄바꿈 허용 */
+        }
+        .infographic-section:nth-child(even) {
+            flex-direction: row-reverse; /* 레이아웃 교차 적용 */
+        }
+        .infographic-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .visual-content, .text-content {
+            flex: 1;
+            min-width: 300px; /* 콘텐츠 최소 너비 */
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* IconFeature 컴포넌트 (거대한 아이콘) */
+        .visual-content i {
+            font-size: 8em; /* 큰 아이콘 */
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: block;
+        }
+        .visual-content .stat-block, .visual-content .progress-bar-container {
+            margin: 20px auto;
+            max-width: 400px; /* 시각적 영향력을 위한 크기 제한 */
+        }
+
+        .text-content h2 {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .text-content ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin: 0 auto;
+            max-width: 500px;
+        }
+        .text-content ul li {
+            background-color: var(--background-color);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            line-height: 1.5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--secondary-color);
+            transition: background-color 0.3s ease;
+        }
+        .text-content ul li:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* StatBlock 컴포넌트 */
+        .stat-block {
+            background-color: var(--primary-color);
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .stat-block .value {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .stat-block .label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* ProgressBar 컴포넌트 */
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 40px;
+            background-color: var(--secondary-color);
+            width: 0%; /* 애니메이션을 위한 초기 너비 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            font-weight: bold;
+            font-size: 1.2em;
+            transition: width 1.5s ease-out;
+            border-radius: 10px;
+        }
+
+        /* KeyTakeawaysBox 컴포넌트 */
+        .key-takeaways-box {
+            background-color: var(--primary-color);
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 60px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .key-takeaways-box h2 {
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            color: #FFFFFF; /* 지능형 대비 보장 */
+        }
+        .key-takeaways-box p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+
+        /* 반응형 조정 */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.5em;
+            }
+            .hero-section p {
+                font-size: 1.1em;
+            }
+            .infographic-section {
+                flex-direction: column !important; /* 작은 화면에서 세로로 쌓기 */
+                text-align: center;
+            }
+            .visual-content, .text-content {
+                width: 100%;
+                padding: 15px;
+            }
+            .visual-content i {
+                font-size: 6em;
+            }
+            .text-content h2 {
+                font-size: 2em;
+            }
+            .text-content ul {
+                max-width: 100%;
+            }
+            .stat-block .value {
+                font-size: 2.8em;
+            }
+            .stat-block .label {
+                font-size: 1em;
+            }
+            .key-takeaways-box h2 {
+                font-size: 2em;
+            }
+            .key-takeaways-box p {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero-section">
+            <h1>2015-2025 한국콜마 핵심 사업 트렌드 분석</h1>
+            <p>과거, 현재, 그리고 미래를 통한 전략적 통찰</p>
+        </header>
+
+        <!-- 슬라이드 1: 과거 (2015-2020) -->
+        <section class="infographic-section" id="past">
+            <div class="visual-content">
+                <i class="fas fa-globe fa-5x"></i>
+            </div>
+            <div class="text-content">
+                <h2>과거 (2015-2020)</h2>
+                <ul>
+                    <li>글로벌 시장 진출 본격화 및 비건 화장품 시장 진입으로 소비자 트렌드 부합함.</li>
+                    <li>중국/미국 고객군 확대 및 CJ헬스케어 인수로 제약 부문 고객층 강화함.</li>
+                    <li>미국/중국 공장 설립 추진 및 친환경 제조 방식 도입으로 생산 능력 확대함.</li>
+                    <li>이데베논 기술 개발 및 3D 프린팅 활용 맞춤형 화장품 개발로 기술 혁신 도모함.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 슬라이드 2: 현재 (2021-2025) -->
+        <section class="infographic-section" id="present">
+            <div class="visual-content">
+                <div class="stat-block">
+                    <div class="value">647억 원</div>
+                    <div class="label">영업이익 (2024년 3분기)</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" data-progress="117">117% 증가</div>
+                </div>
+            </div>
+            <div class="text-content">
+                <h2>현재 (2021-2025)</h2>
+                <ul>
+                    <li>K-뷰티 글로벌 성장 주도, 2024년 3분기 매출 6,500억, 영업이익 647억 달성함.</li>
+                    <li>해외 고객군 확대, 특히 미국 수출 60% 증가로 글로벌 관계 강화함.</li>
+                    <li>제2공장 가동 계획으로 생산 능력 두 배 증대 및 효율적 유통 강화함.</li>
+                    <li>ESG 경영 및 친환경 기술 혁신 집중, '원핸드 펌프 페이퍼 팩' 레드닷 어워드 수상함.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 슬라이드 3: 미래 (2026년 이후 전망) -->
+        <section class="infographic-section" id="future">
+            <div class="visual-content">
+                <i class="fas fa-robot fa-5x"></i>
+            </div>
+            <div class="text-content">
+                <h2>미래 (2026년 이후 전망)</h2>
+                <ul>
+                    <li>지속 가능한 제품 개발 및 비건/친환경 화장품 라인업 확대 계획함.</li>
+                    <li>아시아/북미 고객군 확대 및 인디 브랜드 협력으로 신규 고객층 확보 예정함.</li>
+                    <li>자동화/디지털화 통한 제조 효율성 증대 및 글로벌 공급망 최적화함.</li>
+                    <li>AI/빅데이터 활용 맞춤형 화장품 개발로 기술 경쟁력 강화함.</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="key-takeaways-box">
+            <h2>핵심 요약 및 전망</h2>
+            <p>한국콜마는 과거 글로벌 시장 진출과 비건 트렌드 선점을 통해 성장 기반을 다졌으며, 현재는 K-뷰티의 선두주자로서 매출 및 영업이익의 괄목할 만한 성장을 이루고 있음. 미래에는 ESG 경영과 AI 기반 기술 혁신을 통해 지속 가능한 성장을 추구하며 글로벌 시장에서의 리더십을 더욱 공고히 할 것으로 전망됨.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ProgressBar 애니메이션
+            const progressBars = document.querySelectorAll('.progress-bar');
+            if (progressBars) { /* Null-Safe DOM Access */
+                progressBars.forEach(bar => {
+                    const progress = bar.getAttribute('data-progress');
+                    if (progress) {
+                        // 초기 렌더링 후 전환이 적용되도록 setTimeout 사용
+                        setTimeout(() => {
+                            bar.style.width = progress + '%';
+                        }, 100);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국콜마 핵심 이슈 연대기 - 인터랙티브 대시보드</title>
+    <!-- 기본 폰트 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <!-- 아이콘 라이브러리 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* [디자인 테마 매트릭스] - Professional Blue */
+        :root {
+            --primary-color: #0052cc;
+            --background-color: #f0f2f5;
+            --text-color: #172b4d;
+            --card-bg-color: #ffffff;
+            --border-color: #e0e0e0;
+            --header-height: 60px;
+            --sidebar-width: 220px;
+            --padding-main: 30px; /* 쾌적한 시각적 분리를 위한 간격 */
+        }
+
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Fixed Header */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .fixed-header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        /* Fixed Sidebar */
+        .fixed-sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100% - var(--header-height));
+            background-color: var(--card-bg-color);
+            border-right: 1px solid var(--border-color);
+            padding-top: 20px;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            z-index: 999;
+        }
+
+        .fixed-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .fixed-sidebar ul li a {
+            display: block;
+            padding: 10px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .fixed-sidebar ul li a:hover,
+        .fixed-sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: #FFFFFF; /* 지능형 대비 보장 */
+        }
+
+        /* Main Content Area */
+        main {
+            margin-left: var(--sidebar-width); /* 사이드바 너비만큼 이격 */
+            padding-top: var(--header-height); /* 헤더 높이만큼 이격 */
+            padding: var(--padding-main); /* 쾌적한 시각적 분리를 위한 간격 */
+            box-sizing: border-box;
+        }
+
+        section {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        section h2 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-top: 0;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Card Component */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card p {
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .card ul {
+            list-style: disc;
+            padding-left: 20px;
+            margin-top: 15px;
+            margin-bottom: 0;
+        }
+
+        .card ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Metrics Container */
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        /* StatBlock Component */
+        .stat-block {
+            background-color: var(--background-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-block strong {
+            display: block;
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        /* ProgressBar Component */
+        .progress-bar {
+            background-color: var(--background-color);
+            border-radius: 6px;
+            padding: 15px;
+            overflow: hidden;
+            position: relative;
+            height: 60px; /* Fixed height for consistency */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background-color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: 6px;
+            transition: width 0.5s ease-in-out;
+            z-index: 1;
+        }
+
+        .progress-bar-text {
+            color: #FFFFFF; /* 지능형 대비 보장 */
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .fixed-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: none;
+            }
+
+            .fixed-sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .fixed-sidebar ul li {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+
+            main {
+                margin-left: 0;
+                padding-top: var(--header-height); /* Still need padding for fixed header */
+            }
+
+            .fixed-header {
+                position: static; /* Header becomes static on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="fixed-header">
+        <h1>한국콜마 핵심 이슈 연대기</h1>
+    </header>
+    <nav class="fixed-sidebar">
+        <ul>
+            <li><a href="#year-2014">2014년</a></li>
+            <li><a href="#year-2015">2015년</a></li>
+            <li><a href="#year-2016">2016년</a></li>
+            <li><a href="#year-2017">2017년</a></li>
+            <li><a href="#year-2018">2018년</a></li>
+            <li><a href="#year-2019">2019년</a></li>
+            <li><a href="#year-2020">2020년</a></li>
+            <li><a href="#year-2021">2021년</a></li>
+            <li><a href="#year-2022">2022년</a></li>
+            <li><a href="#year-2023">2023년</a></li>
+            <li><a href="#year-2024">2024년</a></li>
+            <li><a href="#year-2025">2025년</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="year-2014">
+            <h2>2014년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 중국 시장 성장 및 실적 회복</h3>
+                    <p>2014년 한국콜마는 중국 시장에서의 매출 증가와 실적 회복을 통해 긍정적인 성과 거둠. 특히, 중국 법인의 매출 급증으로 전체 실적에 기여함.</p>
+                    <div class="metrics-container">
+                        <div class="progress-bar" data-label="중국법인 매출 전망치 증가율" data-value="35.01"></div>
+                        <div class="stat-block"><strong>904억원</strong>2013년 4분기 별도 매출</div>
+                        <div class="progress-bar" data-label="중국 매출 증가율" data-value="98.9"></div>
+                        <div class="stat-block"><strong>34,000원</strong>목표주가</div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마의 지분율은 1월 3일 기준 10.82%로 증가함. 이는 중국 시장에서의 매출 증가 기대감에 기인함. 삼성증권에 따르면, 한국콜마의 중국법인 매출 전망치는 작년 대비 35.01% 증가할 것으로 예상됨.</li>
+                        <li><strong>02월:</strong> 한국투자증권은 한국콜마의 2014년 실적 회복 전망하며, 목표주가를 34,000원으로 설정함. 2013년 4분기 별도 매출 904억원으로 전년 동기 대비 5.6% 증가했으며, 중국 매출은 98.9% 증가함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 신제품 개발 및 소비 트렌드</h3>
+                    <p>2014년 한국콜마는 소비자 트렌드에 맞춘 혁신적인 신제품 개발에 집중하며 시장 경쟁력 강화함. 특히, 기능성 화장품과 여름 맞춤형 제품이 주목받음.</p>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 봄·여름 시즌을 겨냥한 신제품 발표하며 소비자 트렌드에 부합하는 제품 개발에 집중함. '하이드라 쉐이킹 비비 베이스'는 화장수 성분이 80% 포함되어 있어 지속적인 수분 공급 가능함.</li>
+                        <li><strong>02월:</strong> 한국콜마는 이데베논 활용한 주름 개선 기능성 화장품 개발하여 산업통상자원부의 차세대 일류상품으로 선정됨. 이 제품은 피부 탄력 강화하고 주름 완화하는 효과 있음.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 글로벌 시장 진출 및 인증</h3>
+                    <p>2014년 한국콜마는 글로벌 시장 진출 위한 다양한 전략 추진하며, 유럽 GMP 인증 프로젝트 본격적으로 가동함. 이는 한국콜마의 글로벌 CMO로의 도약을 위한 중요한 이정표 됨.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>179억원</strong>베이징콜마 지난해 매출</div>
+                        <div class="stat-block"><strong>25억원</strong>베이징콜마 당기순이익</div>
+                        <div class="stat-block"><strong>365억원</strong>베이징콜마 올해 매출 목표</div>
+                    </div>
+                    <ul>
+                        <li><strong>07월:</strong> 한국콜마는 7월 25일 콜마파마와 함께 EU GMP 인증 획득 위한 프로젝트 본격적으로 시작 발표함. 이 프로젝트는 오는 11월 유럽 생동시험 착수를 시작으로 2016년 말까지 EU GMP 실사 및 품목허가 승인 목표로 함.</li>
+                        <li><strong>08월:</strong> 한국콜마는 베이징콜마의 생산 공장 증설 중이며, 이는 향후 매출 증가에 기여할 것으로 예상됨. 베이징콜마는 지난해 매출 179억원, 당기순이익 25억원 기록했으며, 올해 매출 목표는 365억원으로 설정됨.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2015">
+            <h2>2015년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 글로벌 시장 진출 및 조직 개편</h3>
+                    <p>2015년 한국콜마는 해외사업본부 신설과 경영방침 '시이리' 설정을 통해 글로벌 시장 진출 본격화하고, 연구개발 역량 강화하는 전략 추진함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1억4000만개</strong>중국 광저우 공장 연간 생산 능력</div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 1월 1일부로 해외사업본부 신설하고, 고객만족경영과 수익성 경영 목표로 하는 '시이리' 경영방침 발표함.</li>
+                        <li><strong>02월:</strong> 중국 광저우에 3만3000㎡ 규모의 화장품 공장 설립 추진하며, 연간 1억4000만개의 화장품 생산 능력 확보 계획 밝힘.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 재무 안정성 및 주주 환원 정책</h3>
+                    <p>한국콜마는 2015년 3월 현금배당 결정을 통해 주주 가치 제고하고, 안정적인 재무 구조 유지하며 지속적인 성장 기반 마련함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>160원</strong>보통주 1주당 현금배당</div>
+                        <div class="stat-block"><strong>33억7천602만원</strong>총 배당금</div>
+                        <div class="stat-block"><strong>1,264억원</strong>1분기 매출</div>
+                        <div class="progress-bar" data-label="1분기 매출 증가율" data-value="18"></div>
+                        <div class="stat-block"><strong>145억원</strong>1분기 영업이익</div>
+                        <div class="progress-bar" data-label="1분기 영업이익 증가율" data-value="63"></div>
+                    </div>
+                    <ul>
+                        <li><strong>03월:</strong> 한국콜마는 보통주 1주당 160원의 현금배당 결정하며, 총 배당금은 약 33억7천602만원에 달함.</li>
+                        <li><strong>05월:</strong> 1분기 매출 1,264억원, 영업이익 145억원으로 각각 18%와 63% 증가하며 실적 개선 이룸.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 사회적 책임 및 지속 가능한 경영</h3>
+                    <p>한국콜마는 사회적 책임 다하기 위해 다양한 기부 활동 전개하고, 지속 가능한 경영 위한 노력 강화함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1억원</strong>네팔 대지진 의료물품 기부</div>
+                        <div class="stat-block"><strong>3000개</strong>메르스 손세정제 기부</div>
+                    </div>
+                    <ul>
+                        <li><strong>05월:</strong> 한국콜마는 네팔 대지진 피해 지원 위해 1억원 상당의 의료물품 기부함.</li>
+                        <li><strong>06월:</strong> 메르스 확산 방지 위해 손세정제 3000개 기부하며 사회적 책임 다하는 모습 보임.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2016">
+            <h2>2016년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 글로벌 시장 진출 및 성장 전략</h3>
+                    <p>2016년 한국콜마는 미국 및 중국 시장 진출 위한 공격적인 전략 통해 글로벌 입지 강화함. 특히, 미국 화장품 제조업체 PTP 인수를 통해 북미 시장 진출의 교두보 마련하고, 중국 제2공장 설립 통해 생산 능력 확대함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>4,000만 달러</strong>미국 시장 매출 목표</div>
+                        <div class="stat-block"><strong>5억2,000만 개</strong>중국 제2공장 연간 생산 능력</div>
+                        <div class="progress-bar" data-label="CSR Cosmetic Solutions Inc. 지분 인수율" data-value="85"></div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 미국 시장 진출 위한 공장 설립 계획 발표하며, 윤동한 회장은 4,000만 달러의 매출 목표 설정함.</li>
+                        <li><strong>06월:</strong> 한국콜마는 중국 강소성 무석시에 제2공장 설립 협약 체결했으며, 이는 연간 5억2,000만 개의 생산 능력 확보 기대됨.</li>
+                        <li><strong>12월:</strong> CSR Cosmetic Solutions Inc.의 지분 85% 인수하여 북미 시장에서 기초 화장품 중심의 실적 개선 기대함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 재무 안정성 및 주주 신뢰 강화</h3>
+                    <p>한국콜마는 국민연금의 주식 취득과 현금배당 결정을 통해 재무 안정성 높이고 주주 신뢰 강화함. 이러한 조치는 기업의 지속 가능한 성장 가능성 반영하며, 외부 투자자의 신뢰 더욱 높임.</p>
+                    <div class="metrics-container">
+                        <div class="progress-bar" data-label="국민연금기금 지분 증가율" data-value="12.4"></div>
+                        <div class="stat-block"><strong>200원</strong>보통주 1주당 현금배당</div>
+                        <div class="stat-block"><strong>42억2003만원</strong>결산배당 총액</div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 국민연금기금이 21만 8,827주의 의결권 있는 주식 신규 취득하여 지분 12.4%로 증가함.</li>
+                        <li><strong>03월:</strong> 한국콜마는 보통주 1주당 200원의 현금배당 결정했으며, 결산배당 총액은 42억2003만원에 달함.</li>
+                        <li><strong>11월:</strong> 한국콜마는 3분기 실적 부진으로 목표 주가 하향 조정되었으나, 여전히 안정적인 재무 상태 유지함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 혁신적인 제품 개발 및 기술력 강화</h3>
+                    <p>한국콜마는 차세대 항산화 성분 이데베논 기술 개발과 융합제품 연구개발 조직 신설 통해 혁신적인 제품 출시 목표로 함. 이는 글로벌 시장에서의 경쟁력 높이는 중요한 요소로 작용함.</p>
+                    <ul>
+                        <li><strong>02월:</strong> 한국콜마는 이데베논의 안정화 및 피부 침투 기술 개발하여 주름 개선 화장품 시장에서 큰 반향 일으켰으며, 이 기술은 기존 성분보다 주름 개선 효과 세 배 이상 우수함.</li>
+                        <li><strong>05월:</strong> 한국콜마는 화장품, 제약, 식품 분야의 융합제품 개발 위해 ‘C&I랩’이라는 연구개발 조직 신설함.</li>
+                        <li><strong>12월:</strong> 김남향 이사는 손발톱 무좀 치료제 개발로 다산기술상 수상하여 한국콜마의 기술 혁신 입증함.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2017">
+            <h2>2017년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 지배구조 강화 및 성장 전망</h3>
+                    <p>2017년 한국콜마는 자회사 주식 취득과 긍정적인 성장 전망 통해 지배구조 강화하고 지속적인 성장세 이어감.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>100억원</strong>자회사 한국콜마 주식 취득 금액</div>
+                        <div class="progress-bar" data-label="보유지분 확대율" data-value="22.47"></div>
+                        <div class="stat-block"><strong>1889억원</strong>4분기 연결 매출 전망</div>
+                        <div class="progress-bar" data-label="4분기 연결 매출 증가율" data-value="35.8"></div>
+                        <div class="stat-block"><strong>185억원</strong>4분기 영업이익 전망</div>
+                        <div class="progress-bar" data-label="4분기 영업이익 증가율" data-value="43.5"></div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마홀딩스는 1월 10일 자회사 한국콜마의 주식 16만8067주 100억원에 취득 결정했으며, 보유지분은 22.47%로 확대될 예정임.</li>
+                        <li><strong>01월:</strong> KB증권은 한국콜마의 4분기 연결 매출 1889억원, 영업이익 185억원으로 전년 동기 대비 각각 35.8%와 43.5% 증가할 것으로 전망함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 제약사업의 성장 및 글로벌 진출</h3>
+                    <p>한국콜마는 제약사업 속도 높이고 글로벌 R&D 전문 제조회사로 도약하기 위한 전략 추진함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1억 1천만 개</strong>제약 공장 증축 후 의약품 생산 능력</div>
+                        <div class="stat-block"><strong>20개</strong>고혈압 치료제 '텔로핀' 공급 제약사 수</div>
+                    </div>
+                    <ul>
+                        <li><strong>02월:</strong> 윤상현 사장은 2017년을 글로벌 NO.1 R&D 전문 제조회사로 도약하는 해로 설정하며, 제약 공장 증축하여 1억 1천만 개의 의약품 생산 가능해졌다고 발표함.</li>
+                        <li><strong>02월:</strong> 고혈압 치료제 '텔로핀'은 출시 2개월 만에 20개 제약사에 공급되는 성과 거둠. 이는 한국콜마의 기술력과 과감한 투자 덕분에 가능함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 글로벌 시장 진출 및 혁신 기술 도입</h3>
+                    <p>한국콜마는 글로벌 시장 진출 위한 마스크팩 전문 생산회사 콜마스크 설립과 3D 프린팅 기술 도입 통해 혁신적인 제조 방식 선보임.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1700만 개</strong>콜마스크 월 생산 능력</div>
+                    </div>
+                    <ul>
+                        <li><strong>03월:</strong> 한국콜마는 3월 30일 마스크팩 전문 생산회사 콜마스크 설립하고, 월 1700만 개의 생산 능력 갖추었다고 발표함.</li>
+                        <li><strong>10월:</strong> 한국콜마는 3D 프린터 개발업체와 협력하여 화장품 제조용 3D 프린터 개발하며 소비자 맞춤형 제품 생산 가능하게 할 계획 밝힘.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2018">
+            <h2>2018년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) CJ헬스케어 인수 및 제약사업 확장</h3>
+                    <p>2018년 한국콜마는 CJ헬스케어를 1조 3,100억원에 인수하며 제약사업 대폭 확장함. 이 인수는 제약 부문 매출 약 7,000억원으로 증가시킬 것으로 예상되며, 종합 제약회사로의 도약 목표로 함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1조 3,100억원</strong>CJ헬스케어 인수 금액</div>
+                        <div class="stat-block"><strong>7,000억원</strong>제약 부문 예상 매출 증가액</div>
+                        <div class="stat-block"><strong>5,368억원</strong>CJ헬스케어 지난해 매출</div>
+                        <div class="stat-block"><strong>750억원</strong>CJ헬스케어 지난해 영업이익</div>
+                        <div class="progress-bar" data-label="주가 상승률" data-value="6.21"></div>
+                    </div>
+                    <ul>
+                        <li><strong>02월:</strong> 한국콜마는 2월 20일 CJ헬스케어의 우선협상대상자로 선정되었으며, 인수 계약 체결함. CJ헬스케어는 지난해 매출 5,368억원, 영업이익 750억원 기록함.</li>
+                        <li><strong>06월:</strong> CJ헬스케어 인수에 따른 매출 증가 기대감으로 한국콜마의 주가는 6월 27일 8만400원으로 6.21% 상승함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 화장품 및 헬스케어 혁신</h3>
+                    <p>한국콜마는 유전체 정보 활용한 맞춤형 화장품 및 헬스케어 제품 출시 발표하며 혁신적인 사업 확장 도모함. 이는 개인 맞춤형 제품 개발 통해 시장 경쟁력 높이는 전략으로 평가됨.</p>
+                    <ul>
+                        <li><strong>04월:</strong> 한국콜마는 4월 2일 유전체 정보 바탕으로 한 맞춤형 화장품과 헬스케어 제품 하반기부터 출시 계획 발표함.</li>
+                        <li><strong>12월:</strong> 한국콜마는 애터미와 공동 개발한 '특화 전달 기술'로 국내 특허 획득하여 화장품 분야에서의 기술 혁신 이룸.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 재무 성과 및 주가 변동</h3>
+                    <p>2018년 한국콜마는 매출 1조 클럽 가입 후보로 부각되며, 매출과 영업이익의 급증으로 주가 상승세 보임. 그러나 유상증자 결정으로 주가 하락 우려도 나타남.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>3,601억원</strong>2사분기 매출액</div>
+                        <div class="progress-bar" data-label="2사분기 매출액 증가율" data-value="73.9"></div>
+                        <div class="stat-block"><strong>246억원</strong>2사분기 영업이익</div>
+                        <div class="progress-bar" data-label="2사분기 영업이익 증가율" data-value="44.8"></div>
+                        <div class="stat-block"><strong>1000억원</strong>제3자배정 유상증자 규모</div>
+                        <div class="progress-bar" data-label="주가 하락률" data-value="4"></div>
+                    </div>
+                    <ul>
+                        <li><strong>11월:</strong> 한국콜마의 2사분기 실적은 매출액 3,601억원(+73.9%), 영업이익 246억원(+44.8%) 기록하며 주가 상승함.</li>
+                        <li><strong>10월:</strong> 한국콜마는 1000억원 규모의 제3자배정 유상증자 결정했으며, 이로 인해 주가는 4% 하락하여 77,900원에 거래됨.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2019">
+            <h2>2019년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) CJ헬스케어 인수 및 제약 부문 성장</h3>
+                    <p>2019년 한국콜마는 CJ헬스케어 인수를 통해 제약 부문에서의 성장 도모하며, 매출 목표 1조원으로 설정함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1조7천억원</strong>올해 매출 목표</div>
+                        <div class="stat-block"><strong>1조원</strong>제약 매출 목표</div>
+                    </div>
+                    <ul>
+                        <li><strong>02월:</strong> 한국콜마는 CJ헬스케어 인수로 인해 제약사업의 안정성과 성장성 확보했으며, 올해 매출 1조7천억원을 목표로 함.</li>
+                        <li><strong>04월:</strong> 이호경 제약부문 대표는 CJ헬스케어와의 시너지 통해 제약 매출 목표 1조원으로 설정했다고 밝힘.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 불매운동 및 경영 위기</h3>
+                    <p>2019년 한국콜마는 윤동한 회장의 극우 성향 유튜브 영상 상영으로 인해 불매운동 확산되며 경영 위기 겪음.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>8만2천원</strong>하향 조정 전 목표주가</div>
+                        <div class="stat-block"><strong>6만2천원</strong>하향 조정 후 목표주가</div>
+                    </div>
+                    <ul>
+                        <li><strong>08월:</strong> 윤동한 회장은 월례조회에서 극우 성향의 유튜브 영상 상영하여 논란 일으켰고, 이로 인해 불매운동 확산됨.</li>
+                        <li><strong>09월:</strong> 한국콜마의 목표주가는 불매운동과 중국 화장품 시장의 경쟁 심화로 인해 8만2천원에서 6만2천원으로 하향 조정됨.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 글로벌 시장 진출 및 기술 혁신</h3>
+                    <p>2019년 한국콜마는 해외 진출 위한 사명 변경 추진과 3D 프린팅 화장품 개발 등 기술 혁신 통해 글로벌 시장에서의 입지 강화함.</p>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 해외 진출 강화하기 위해 사명 변경 추진 중이며, KKM으로의 변경 검토 중임.</li>
+                        <li><strong>03월:</strong> 한국콜마는 3D 프린팅 기술 활용한 화장품 세계 최초로 개발하여, 맞춤형 화장품 개발 가능해질 전망임.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2020">
+            <h2>2020년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 2세 경영 체제의 본격화</h3>
+                    <p>2020년 한국콜마는 윤여원 부사장이 콜마비앤에이치의 사장으로 승진하며 2세 경영 체제 본격화됨. 이는 한국콜마의 경영 전략과 방향성 새롭게 설정하는 계기 됨.</p>
+                    <ul>
+                        <li><strong>01월:</strong> 윤여원 사장은 "콜마비앤에이치는 건강기능식품 ODM 최고 기업에서 글로벌 헬스&뷰티 연구개발 전문기업으로 성장할 계획"이라고 포부 밝힘.</li>
+                        <li><strong>02월:</strong> 한국콜마홀딩스는 제약사업부와 콜마파마 IMM PE에 매각하기 위한 양해각서(MOU) 체결하며 재무구조 개선 위한 전략 추진함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 제약사업부 매각 및 사업 재편</h3>
+                    <p>2020년 한국콜마는 제약사업부 및 콜마파마 매각 통해 사업 구조 재편하고 재무구조 개선 도모함. 이는 제약 부문에서의 경쟁력 강화하기 위한 중요한 결정이었음.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>7500억원</strong>매각 규모 추정치</div>
+                        <div class="progress-bar" data-label="제약사업부 매출 비중" data-value="20"></div>
+                    </div>
+                    <ul>
+                        <li><strong>02월:</strong> 매각 규모는 약 7500억원으로 추정되며, 한국콜마는 제약사업부에서 발생하는 매출의 20% 차지함.</li>
+                        <li><strong>12월:</strong> 제뉴원사이언스가 한국콜마의 제약사업부와 콜마파마 인수 완료하고 통합법인 출범하여 의약품 위탁생산(CMO) 사업 지속적으로 확장할 계획임.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 비건 화장품 시장 진출</h3>
+                    <p>2020년 한국콜마는 비건 화장품 시장에 진출하며 채식주의자를 위한 다양한 제품 출시함. 이는 윤리적 소비 트렌드에 부합하는 전략으로 평가됨.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>10종</strong>비건 화장품 출시 제품 수</div>
+                    </div>
+                    <ul>
+                        <li><strong>09월:</strong> 한국콜마는 비건 인증 받은 선크림, 마스카라, 쿠션 제품 등 10종의 화장품 출시하며 비건 화장품 라인업 확대함.</li>
+                        <li><strong>10월:</strong> 한국콜마는 비건 화장품 시장의 성장 가능성 인식하고, 글로벌 시장에서의 점유율 확대 계획함.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2021">
+            <h2>2021년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 재무구조 개선 및 사업 포트폴리오 다각화</h3>
+                    <p>2021년 한국콜마는 제약 CMO 사업 매각과 자회사 HK이노엔의 상장 추진 통해 재무구조 개선하고 사업 포트폴리오 다각화함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>3,011억원</strong>제약 CMO 사업 총 매각 금액</div>
+                        <div class="stat-block"><strong>2조원대</strong>HK이노엔 기업가치 평가</div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 제약 CMO 사업 매각 완료하고 총 매각 금액 3,011억원 기록함. 이는 재무구조 개선과 사업 역량 강화 위한 전략으로 분석됨.</li>
+                        <li><strong>06월:</strong> 자회사 HK이노엔은 2조원대의 기업가치 평가받으며 상장 절차에 돌입했고, 이는 한국콜마의 제약바이오 부문 성장 가능성 높이는 계기 됨.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 글로벌 시장 진출 및 제품 혁신</h3>
+                    <p>2021년 한국콜마는 글로벌 시장 진출 위한 다양한 제품 혁신 추진하며, 특히 화장품 및 건강기능식품 분야에서 성과 거둠.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>35개</strong>리퀴드 파운데이션 색상 수</div>
+                    </div>
+                    <ul>
+                        <li><strong>03월:</strong> 한국콜마는 35개 색상으로 구성된 리퀴드 파운데이션 개발하여 글로벌 시장 진출 계획 중이며, 이는 다양한 소비자의 피부색 커버할 수 있도록 설계됨.</li>
+                        <li><strong>10월:</strong> 한국콜마는 친환경 화장품 용기 개발에 집중하며, 종이튜브 패키지가 세계 3대 디자인 어워드에서 수상하는 성과 거둠.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 사회적 책임 및 지속 가능한 경영</h3>
+                    <p>2021년 한국콜마는 사회적 책임 다하기 위한 다양한 활동 전개하며, 지속 가능한 경영 강화하는 방향으로 나아감.</p>
+                    <ul>
+                        <li><strong>05월:</strong> 한국콜마는 청주소년원과의 협약 통해 보호소년 지원 위한 멘토링 및 직업 소개 프로그램 운영하고, 색조 화장품 전달하기로 함.</li>
+                        <li><strong>08월:</strong> 한국콜마는 미세플라스틱 대체 친환경 제품 개발 위해 루츠랩과 협력하여 배 석세포 활용한 화장품 및 건강기능식품 개발 추진 중임.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2022">
+            <h2>2022년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 기술 혁신 및 지속 가능성</h3>
+                    <p>2022년 한국콜마는 환경 친화적인 화장품 기술 개발과 지속 가능한 제품 라인업 확장을 통해 시장에서의 경쟁력 강화함.</p>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마는 비건 인증 받은 성분 사용하여 색상 지속력 높인 립 화장품 기술 개발하고, 이를 통해 글로벌 시장 진출 위한 특허 출원 완료함.</li>
+                        <li><strong>06월:</strong> 미세플라스틱을 천연 물질인 실리카로 대체하는 기술 개발하여, 내년 초 제품 출시 목표로 하며, 이는 클린뷰티 트렌드에 부합하는 전략으로 평가됨.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 글로벌 시장 확장 및 M&A</h3>
+                    <p>한국콜마는 해외 시장 진출 위한 M&A와 전략적 협약 체결 통해 사업 다각화와 글로벌 입지 강화 도모함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>2,864억원</strong>화장품 용기 제조업체 연우 인수 금액</div>
+                    </div>
+                    <ul>
+                        <li><strong>04월:</strong> 한국콜마는 화장품 용기 제조업체 연우 2,864억원에 인수하여 화장품 사업의 밸류체인 확대하고, ODM 시장에서의 경쟁력 강화할 계획임.</li>
+                        <li><strong>09월:</strong> 아랍에미리트의 UAE BPC와 화장품 PB 상품 공급 계약 체결하며 중동 화장품 시장 진출 본격화함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 재무 성과 및 ESG 경영</h3>
+                    <p>한국콜마는 매출 성장과 함께 ESG 경영 실천 통해 지속 가능한 기업으로서의 입지 다짐.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>181억원</strong>3분기 영업이익</div>
+                        <div class="progress-bar" data-label="3분기 영업이익 증가율" data-value="41.4"></div>
+                        <div class="progress-bar" data-label="색조 제품 매출 증가율" data-value="150"></div>
+                    </div>
+                    <ul>
+                        <li><strong>11월:</strong> 한국콜마는 3분기 영업이익 181억원으로 전년 대비 41.4% 증가했으며, 색조 제품 매출 150% 이상 증가한 것으로 나타남.</li>
+                        <li><strong>08월:</strong> 한국콜마는 ESG 경영 지속적으로 실천하는 국내 대표 기업으로 선정되었으며, ISO 37001 및 ISO 37301 통합인증 획득함.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2023">
+            <h2>2023년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 해외법인 및 자회사 실적 회복</h3>
+                    <p>2023년 한국콜마는 해외법인과 자회사 연우의 실적 회복 통해 안정적인 성장 기반 마련함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1626억원</strong>2023년 연결 기준 매출액 전망</div>
+                        <div class="progress-bar" data-label="매출액 증가율" data-value="18"></div>
+                        <div class="stat-block"><strong>1262억원</strong>2023년 연결 기준 영업이익 전망</div>
+                        <div class="progress-bar" data-label="영업이익 증가율" data-value="47"></div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 키움증권은 한국콜마의 2023년 연결 기준 매출액 1626억원, 영업이익 1262억원으로 각각 전년 대비 18%, 47% 증가할 것으로 전망함.</li>
+                        <li><strong>03월:</strong> 한화투자증권은 한국콜마의 목표주가 상향 조정하며, 중국의 경제활동 정상화로 인해 무석 법인의 대형 고객사 수주 증가할 것으로 분석함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 사회적 책임 및 기업 이미지 제고</h3>
+                    <p>한국콜마는 사회적 책임 다하기 위한 다양한 활동 통해 기업 이미지 강화함.</p>
+                    <ul>
+                        <li><strong>02월:</strong> 윤동한 회장은 무궁화 역사문화관 개관하여 한국의 전통 문화 알리고, 사회적 책임 다하겠다는 의지 보임.</li>
+                        <li><strong>09월:</strong> 윤 회장은 '수산물 소비 및 어촌·바다 휴가 활성화 챌린지'에 참여하여 사회적 책임 강조하며, 소비 촉진의 필요성 역설함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 지속 가능한 경영 및 혁신</h3>
+                    <p>한국콜마는 지속 가능한 경영 위한 친환경 제품 개발과 혁신적인 연구개발 방향 제시함.</p>
+                    <div class="metrics-container">
+                        <div class="progress-bar" data-label="플라스틱 사용량 절감률" data-value="86"></div>
+                    </div>
+                    <ul>
+                        <li><strong>04월:</strong> 한국콜마는 자투리 돌로 만든 종이 스틱 화장품 용기 개발하여 플라스틱 사용량 86% 줄일 수 있다고 발표함.</li>
+                        <li><strong>10월:</strong> 한국콜마는 넥스트앤바이오와 동물대체시험 플랫폼 개발 위한 협약 체결하여 혁신적인 시험법 개발 목표로 함.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2024">
+            <h2>2024년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) K-뷰티 글로벌 성장 주도</h3>
+                    <p>2024년 한국콜마는 K-뷰티의 글로벌 성장세 주도하며 역대 최대 실적 기록하고, 주가 상승 경험함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>6,500억 원</strong>3분기 매출액 예상</div>
+                        <div class="progress-bar" data-label="3분기 매출액 증가율" data-value="26"></div>
+                        <div class="stat-block"><strong>647억 원</strong>3분기 영업이익 예상</div>
+                        <div class="progress-bar" data-label="3분기 영업이익 증가율" data-value="117"></div>
+                        <div class="stat-block"><strong>93억 달러</strong>2024년 11월까지 화장품 누적 수출 실적</div>
+                    </div>
+                    <ul>
+                        <li><strong>10월:</strong> 한국콜마는 3분기 매출액 약 6,500억 원, 영업이익 약 647억 원으로 예상하며, 이는 전년 동기 대비 각각 26%, 117% 증가한 수치임.</li>
+                        <li><strong>12월:</strong> 한국콜마는 2024년 11월까지 화장품 누적 수출 실적 93억 달러에 달해 역대 최대치 기록했으며, K뷰티의 글로벌 위상 강화 위해 인디 브랜드와의 협력 강화 중임.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) 사회적 책임 및 기부 활동</h3>
+                    <p>한국콜마는 사회적 책임 다하기 위해 다양한 기부 활동 진행하며 긍정적인 기업 이미지 구축 중임.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>1억원</strong>레드크로스 아너스기업 가입 기부금</div>
+                        <div class="stat-block"><strong>2억원</strong>서울대 발전재단 기부금</div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 한국콜마의 석오문화재단은 대한적십자사의 '레드크로스 아너스기업'에 가입하며 1억원 기부함.</li>
+                        <li><strong>12월:</strong> 한국콜마는 서울대 발전재단에 인문대학 발전 기금 2억원 기부하여 인재 양성에 기여하고 있으며, 윤동한 회장은 지속적인 기부 활동 통해 사회적 책임 다하고 있다고 강조함.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) ODM 업체로서의 경쟁력 강화</h3>
+                    <p>한국콜마는 ODM 업체로서의 경쟁력 강화하기 위해 글로벌 시장 진출 위한 전략적 협력 확대 중임.</p>
+                    <ul>
+                        <li><strong>07월:</strong> 한국콜마는 세계 최대 색조 원료사인 센시언트 뷰티와 신규 색소 및 원료 개발에 관한 업무협약 체결함.</li>
+                        <li><strong>10월:</strong> 한국콜마는 중국 현지 법인인 무석콜마 통해 중국 이커머스 시장과 동남아 수출의 교두부 역할 계획 중이며, ODM 영업 강화할 예정임.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="year-2025">
+            <h2>2025년 한국콜마 핵심 이슈</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>(#1) 경영 전문성 강화 및 글로벌 시장 확장</h3>
+                    <p>2025년 한국콜마는 안병준 전 대표이사의 티르티르 공동 대표 취임 통해 경영 전문성 강화하고, 글로벌 시장에서의 브랜드 신뢰성 높이기 위한 전략 추진함.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>15조 원</strong>미국 시장 수출 성과 중</div>
+                        <div class="progress-bar" data-label="미국 시장 수출 증가율" data-value="60"></div>
+                    </div>
+                    <ul>
+                        <li><strong>01월:</strong> 안병준 대표는 '진정성 있는 소통' 통해 고객의 피드백 반영하고, 차별화된 제품 포트폴리오 개발하여 글로벌 기업으로 자리매김하겠다고 밝힘.</li>
+                        <li><strong>02월:</strong> 한국콜마는 미국 시장에서의 수출 성과 15조 원 중 60% 증가하며, 제2공장 가동 통해 생산능력 두 배로 늘릴 계획 세움.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#2) ESG 경영 및 친환경 기술 혁신</h3>
+                    <p>2025년 한국콜마는 ESG 경영 강화하며 K-뷰티 산업의 환경 리더로 자리매김하고, 지속 가능한 제품 개발에 집중함.</p>
+                    <ul>
+                        <li><strong>06월:</strong> 한국콜마는 '원핸드 펌프 페이퍼 팩'으로 레드닷 디자인 어워드에서 본상 수상하며 친환경 디자인 경쟁력 입증함.</li>
+                        <li><strong>07월:</strong> 한국콜마는 제2공장 통해 관세 부담 해소하고, 기초 스킨케어 및 선케어 제품 생산하여 K뷰티의 글로벌 진출 가속화할 계획임.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>(#3) 주가 상승 및 외국인 투자자 관심</h3>
+                    <p>2025년 한국콜마는 외국인 투자자들의 대량 순매수로 주가 급등하며 52주 신고가 경신했고, 긍정적인 실적 전망 이어짐.</p>
+                    <div class="metrics-container">
+                        <div class="stat-block"><strong>7만3000원</strong>주가</div>
+                        <div class="progress-bar" data-label="올해 주가 상승률" data-value="32.49"></div>
+                        <div class="stat-block"><strong>525억원</strong>1분기 영업이익 예상</div>
+                        <div class="progress-bar" data-label="1분기 영업이익 증가율" data-value="62"></div>
+                        <div class="stat-block"><strong>58.1만 주</strong>외국인 투자자 순매수량</div>
+                    </div>
+                    <ul>
+                        <li><strong>04월:</strong> 한국콜마의 주가는 7만3000원에 거래되며, 올해 들어 32.49% 상승했고, 1분기 영업이익 525억원으로 전년 동기 대비 62% 증가할 것으로 예상됨.</li>
+                        <li><strong>06월:</strong> 외국인 투자자들은 58.1만 주 순매수하며, 한국콜마의 안정적인 성장세와 K뷰티의 서구권 진출 가속화에 대한 긍정적인 전망 반영함.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ProgressBar 렌더링
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const value = parseFloat(bar.dataset.value);
+                const label = bar.dataset.label;
+                if (!isNaN(value)) {
+                    const progressBarInner = document.createElement('div');
+                    progressBarInner.className = 'progress-bar-inner';
+                    progressBarInner.style.width = `${Math.min(100, Math.max(0, value))}%`; // 0-100% 범위 클램핑
+
+                    const progressBarText = document.createElement('span');
+                    progressBarText.className = 'progress-bar-text';
+                    progressBarText.textContent = `${label}: ${value}%`;
+
+                    bar.appendChild(progressBarInner);
+                    bar.appendChild(progressBarText);
+                }
+            });
+
+            // 사이드바 내비게이션 활성화 및 스크롤 기능
+            const sidebarLinks = document.querySelectorAll('.fixed-sidebar ul li a');
+            const sections = document.querySelectorAll('section');
+
+            const activateLink = (id) => {
+                sidebarLinks.forEach(link => {
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            };
+
+            const onScroll = () => {
+                let currentActiveSectionId = '';
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    // 섹션이 뷰포트 상단에 있거나 스크롤되어 지나간 경우 활성화
+                    if (rect.top <= (window.innerHeight / 2) && rect.bottom >= (window.innerHeight / 2)) {
+                        currentActiveSectionId = section.id;
+                    }
+                });
+                if (currentActiveSectionId) {
+                    activateLink(currentActiveSectionId);
+                }
+            };
+
+            // 초기 로드 시 및 스크롤 시 활성화
+            onScroll();
+            window.addEventListener('scroll', onScroll);
+
+            // 사이드바 링크 클릭 시 부드러운 스크롤
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        // 헤더와 사이드바 높이를 고려하여 스크롤 위치 조정
+                        const offsetTop = targetSection.offsetTop - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--padding-main')));
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                        activateLink(targetId); // 클릭 시 바로 활성화
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
